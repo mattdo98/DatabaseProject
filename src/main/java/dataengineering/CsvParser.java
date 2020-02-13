@@ -14,11 +14,6 @@ import java.util.List;
 public class CsvParser {
 
     private List fileRows = new ArrayList();
-  /* List to hold all fields from the file
-  As it is a csv of only strings, we could make it a String
-  But it pretty common to have to handle multiple types
-      So you either use a Class or Blank Object type (like we are here)
-   */
 
     public CsvParser(String infile) throws IOException, CsvValidationException {
         /** CsvParser - Reads csv Files using OpenCSV
