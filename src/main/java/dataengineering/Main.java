@@ -9,10 +9,7 @@ import com.opencsv.CSVReaderBuilder;
 import com.opencsv.exceptions.CsvException;
 import com.opencsv.exceptions.CsvValidationException;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -21,16 +18,34 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Scanner;
 
 
 public class Main {
   private static final String JDBC_DRIVER = "org.sqlite.Driver";
   private static final String DB_URL = "jdbc:sqlite:./src/Data/Database/.BookstoreDB";
 
-
   public static void main(String[] args) throws IOException, CsvValidationException, SQLException {
-    Connection con = Connect();
+    Connect();
+    Scanner sc = new Scanner(System.in);
+    System.out.println("Please enter a number to select an option \n 1. Add to Author database \n 2. Add to Book Database");
+    int choice = sc.nextInt();
+    switch (choice){
+      case 1:
+        AddToAuthorDB();
+        System.out.println("Author database added");
+        break;
+      case 2:
+        AddToBookDB();
+        System.out.println("Book database added");
+        break;
+    }
+  }
 
+
+
+  public static void AddToAuthorDB() throws SQLException, FileNotFoundException {
+    Connection con = Connect();
     //Create gson object to read from author Json file
     Gson gson = new Gson();
     JsonReader jread = new JsonReader(new FileReader("src/Data/authors.json"));
@@ -41,16 +56,18 @@ public class Main {
       String name = data.getAuthor_name();
       String email = data.getAuthor_email();
       String url = data.getAuthor_url();
-      System.out.println(name);
-     pstmt.setString(1,name);
-     pstmt.setString(2,email);
-     pstmt.setString(3,url);
-     pstmt.execute();
+      pstmt.setString(1,name);
+      pstmt.setString(2,email);
+      pstmt.setString(3,url);
+      pstmt.execute();
 
     }
 
+  }
 
-    //CsvParser to read from bookstore csv file
+  public static void AddToBookDB() throws SQLException{
+
+    Connection con = Connect();
     String csvFile = "src/Data/bookStoreReport.csv";
     CSVParser parse = new CSVParserBuilder().withSeparator(',').build();
     PreparedStatement stmt2 = con.prepareStatement("INSERT  INTO book(isbn, publisher_name, author_name, book_year, book_title,book_price) values ( ?,?,?,?,?,? )");
@@ -72,26 +89,14 @@ public class Main {
         String bookPrice = row[5];
         stmt2.setString(6,bookPrice);
         stmt2.execute();
-        }
-    }catch (CsvException e) { e.printStackTrace(); }
+      }
+    }catch (CsvException | IOException e) { e.printStackTrace(); }
+
+
+
 
 
   }
-
-
-
-private static dataengineering.Book makeBook(String[] data){
-    String isbn = data[0];
-    String pubName = data[1];
-    String authorName = data[2];
-    int bookYear = Integer.parseInt(data[3]);
-    String bookTitle = data[4];
-    double bookPrice = Double.parseDouble(data[5]);
-
-
-    return new dataengineering.Book(isbn,pubName,authorName,bookYear,bookTitle,bookPrice);
-
-}
 
 
 
