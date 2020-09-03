@@ -7,5 +7,5 @@
   
   ## Updates 
  
- v1.0 Interation  1 : Added CSVParser and .csv prints to console successfully.
+ v1.0 Interation  1 : Added CSVParser and .csv prints to console successfully.\n
  v2.0 Interation  2 : Used JSON and CSVParser to load a .json file and .csv to a database.
